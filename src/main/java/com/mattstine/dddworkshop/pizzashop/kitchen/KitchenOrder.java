@@ -117,11 +117,18 @@ public final class KitchenOrder implements Aggregate {
 
     @Override
     public KitchenOrder identity() {
+
+        // builder for each Aggregate need to:
+        // 1. construct the new instance of Aggregate
+        // 2. set each property to its identity value, and
+        // 3. return the Aggregate Instance
+
         return KitchenOrder.builder()
 				.ref(KitchenOrderRef.IDENTITY)
 				.onlineOrderRef(OnlineOrderRef.IDENTITY)
 				.eventLog(EventLog.IDENTITY)
-				.build();
+                .build();
+                
     }
 
     @Override
@@ -148,15 +155,23 @@ public final class KitchenOrder implements Aggregate {
     private static class Accumulator implements BiFunction<KitchenOrder, KitchenOrderEvent, KitchenOrder> {
 
         @Override
+
+        // Check input event, and move Aggregator to the next state determined by this input event
+        // or on AggregatorAddedEvent ret Aggregate's instance
         public KitchenOrder apply(KitchenOrder kitchenOrder, KitchenOrderEvent kitchenOrderEvent) {
-        	if (kitchenOrderEvent instanceof KitchenOrderAddedEvent) {
+            
+
+            if (kitchenOrderEvent instanceof KitchenOrderAddedEvent) {
+
         		KitchenOrderAddedEvent koae = (KitchenOrderAddedEvent) kitchenOrderEvent;
         		return KitchenOrder.builder()
 						.eventLog(InProcessEventLog.instance())
 						.onlineOrderRef(koae.getState().getOnlineOrderRef())
 						.ref(koae.getRef())
 						.pizzas(koae.getState().getPizzas())
-						.build();
+                        .build();
+                // NOTE: eventLog is a simple Singleton, not the prodution raady logger
+            // otherwise move the state to the next state, defined by the input event
 			} else if (kitchenOrderEvent instanceof KitchenOrderPrepStartedEvent) {
         		kitchenOrder.state = State.PREPPING;
         		return kitchenOrder;

@@ -118,12 +118,18 @@ public final class Pizza implements Aggregate {
 
     @Override
     public Pizza identity() {
+
+        // builder for each Aggregate need to:
+        // 1. construct the new instance of Aggregate
+        // 2. set each property to its identity value, and
+        // 3. return the Aggregate Instance
         return Pizza.builder()
                 .eventLog(EventLog.IDENTITY)
                 .kitchenOrderRef(KitchenOrderRef.IDENTITY)
                 .ref(PizzaRef.IDENTITY)
                 .size(Size.IDENTITY)
                 .build();
+
     }
 
     @Override
@@ -156,6 +162,8 @@ public final class Pizza implements Aggregate {
     private static class Accumulator implements BiFunction<Pizza, PizzaEvent, Pizza> {
 
         @Override
+        // Check input event, and move Aggregator to the next state determined by this input event
+        // or on AggregatorAddedEvent ret Aggregate's instance
         public Pizza apply(Pizza pizza, PizzaEvent pizzaEvent) {
             if (pizzaEvent instanceof PizzaAddedEvent) {
                 PizzaAddedEvent pae = (PizzaAddedEvent) pizzaEvent;
@@ -165,6 +173,7 @@ public final class Pizza implements Aggregate {
                         .kitchenOrderRef(pae.getState().getKitchenOrderRef())
                         .eventLog(InProcessEventLog.instance())
                         .build();
+            // move to the next state defined by the input event:            
             } else if (pizzaEvent instanceof PizzaPrepStartedEvent) {
                 pizza.state = State.PREPPING;
                 return pizza;
