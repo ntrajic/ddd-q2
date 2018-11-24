@@ -19,20 +19,30 @@ final class InProcessEventSourcedKitchenOrderRepository extends InProcessEventSo
                 KitchenOrderAddedEvent.class,
                 topic);
 
-        onlineOrderRefToKitchenOrderRef = new HashMap<>();
+        // create an index - OnlineOrderRef idx, for findByOnlineOrderRef() 
+        // map<OnlineOrderRef, KitchenOrderRef> ; value is refereced instance of KitchenOrder  
+        onlineOrderRefToKitchenOrderRef = new HashMap<>();   
 
+        // BUILD ALTERNATE INDEX on new KitchenOrderAddedEvent
+        // subscribe to KitchenOrder topic; whenever event Repository.KitchenOrderAdd 
+        // is spawned, this event stores state of the Aggragate, and ref to Aggregate,
+        // while map<OnlineOrderRef, KitchenOrderRef>
         eventLog.subscribe(topic, (e) -> {
             if (e instanceof KitchenOrderAddedEvent) {
                 onlineOrderRefToKitchenOrderRef.put(((KitchenOrderAddedEvent) e)
                                 .getState()
-                                .getOnlineOrderRef(),
-                        ((KitchenOrderAddedEvent) e).getRef());
+                                .getOnlineOrderRef(),                  // Key
+                        ((KitchenOrderAddedEvent) e).getRef());        // value put
             }
         });
     }
 
     @Override
+    // Design findByOnlineOrderRef(): use above created OnlineOrderRef index, to find a KitchenOrder by its OnlineOrderRef. 
+    // Whenver KitchenOrder is addded to the Repository, update OnlineOrderRef index.
+    //Result: InProcessEventSourceKitchenOrderRepository.findByOnlineOrderRef()
     public KitchenOrder findByOnlineOrderRef(OnlineOrderRef onlineOrderRef) {
+        // obtain KitchenOrderRef as value in the map<OnlineOrderRef, KithenOrderRef>
         KitchenOrderRef kitchenOrderRef = onlineOrderRefToKitchenOrderRef.get(onlineOrderRef);
         return findByRef(kitchenOrderRef);
     }
