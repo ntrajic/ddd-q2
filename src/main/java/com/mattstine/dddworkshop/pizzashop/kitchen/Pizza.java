@@ -46,27 +46,35 @@ public final class Pizza implements Aggregate {
     }
 
     public boolean isNew() {
+
         return state == State.NEW;
+
     }
 
     void startPrep() {
+
         if (state != State.NEW) {
             throw new IllegalStateException();
         }
         state = State.PREPPING;
         $eventLog.publish(new Topic("pizzas"), new PizzaPrepStartedEvent(ref));
+    
     }
 
     boolean isPrepping() {
+
         return state == State.PREPPING;
+
     }
 
     void finishPrep() {
+
         if (state != State.PREPPING) {
             throw new IllegalStateException();
         }
         state = State.PREPPED;
         $eventLog.publish(new Topic("pizzas"), new PizzaPrepFinishedEvent(ref));
+    
     }
 
     boolean hasFinishedPrep() {
@@ -82,19 +90,25 @@ public final class Pizza implements Aggregate {
     }
 
     boolean isBaking() {
+
         return state == State.BAKING;
+
     }
 
     void finishBake() {
+
         if (state != State.BAKING) {
             throw new IllegalStateException();
         }
         state = State.BAKED;
         $eventLog.publish(new Topic("pizzas"), new PizzaBakeFinishedEvent(ref));
+    
     }
 
     boolean hasFinishedBaking() {
+
         return state == State.BAKED;
+
     }
 
     @Override

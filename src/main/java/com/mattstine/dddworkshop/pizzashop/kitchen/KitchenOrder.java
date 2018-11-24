@@ -1,19 +1,20 @@
 package com.mattstine.dddworkshop.pizzashop.kitchen;
 
+import java.util.List;
+import java.util.function.BiFunction;
+
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
 import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
+
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-
-import java.util.List;
-import java.util.function.BiFunction;
 
 @Value
 public final class KitchenOrder implements Aggregate {
@@ -46,15 +47,19 @@ public final class KitchenOrder implements Aggregate {
     }
 
     public boolean isNew() {
+
         return state == State.NEW;
+
     }
 
     void startPrep() {
+
     	if (state != State.NEW) {
     		throw new IllegalStateException("only NEW order can start prep");
 		}
     	state = State.PREPPING;
     	$eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderPrepStartedEvent(ref));
+    
     }
 
     boolean isPrepping() {
@@ -62,40 +67,50 @@ public final class KitchenOrder implements Aggregate {
     }
 
     void startBake() {
+
 		if (state != State.PREPPING) {
 			throw new IllegalStateException("only PREPPING order can start bake");
 		}
 		state = State.BAKING;
 		$eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderBakeStartedEvent(ref));
-	}
+    
+    }
 
     boolean isBaking() {
         return state == State.BAKING;
     }
 
     void startAssembly() {
+
 		if (state != State.BAKING) {
 			throw new IllegalStateException("only BAKING order can start assembly");
 		}
 		state = State.ASSEMBLING;
 		$eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderAssemblyStartedEvent(ref));
-	}
+    
+    }
 
     boolean hasStartedAssembly() {
+
         return state == State.ASSEMBLING;
+
     }
 
     void finishAssembly() {
+
 		if (state != State.ASSEMBLING) {
 			throw new IllegalStateException("only ASSEMBLING order can finish assembly");
 		}
 		state = State.ASSEMBLED;
 		$eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderAssemblyFinishedEvent(ref));
-	}
+    
+    }
 
     boolean hasFinishedAssembly() {
+
         return state == State.ASSEMBLED;
     }
+    
 
     @Override
     public KitchenOrder identity() {
