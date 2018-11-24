@@ -185,8 +185,10 @@ public final class Pizza implements Aggregate {
 
     @Value
     static class PizzaState implements AggregateState {
+
         PizzaRef ref;
         KitchenOrderRef kitchenOrderRef;
         Size size;
+        
     }
 }

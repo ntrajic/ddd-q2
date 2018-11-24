@@ -9,20 +9,28 @@ import lombok.Value;
  */
 @Value
 public final class PizzaRef implements Ref {
+
+    // provide the next available identity
     public static final PizzaRef IDENTITY = new PizzaRef("");
     String reference;
 
     public PizzaRef() {
-       reference = RefStringGenerator.generateRefString();
+    
+        // a new PizzaRef is generated
+        reference = RefStringGenerator.generateRefString();
     }
 
     @SuppressWarnings("SameParameterValue")
     private PizzaRef(String reference) {
+
         this.reference = reference;
+
     }
 
     @Override
+
     public String getReference() {
         return reference;
+        
     }
 }

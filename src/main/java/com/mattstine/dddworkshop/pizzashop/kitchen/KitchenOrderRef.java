@@ -9,16 +9,22 @@ import lombok.Value;
  */
 @Value
 public final class KitchenOrderRef implements Ref {
+    //providing the "" empty identity:
     public static final KitchenOrderRef IDENTITY = new KitchenOrderRef("");
     private String reference;
 
     public  KitchenOrderRef() {
+
+        //generating the next available identity:
         reference = RefStringGenerator.generateRefString();
+    
     }
 
     @SuppressWarnings("SameParameterValue")
     private KitchenOrderRef(String reference) {
+
         this.reference = reference;
+        
     }
 
     @Override
