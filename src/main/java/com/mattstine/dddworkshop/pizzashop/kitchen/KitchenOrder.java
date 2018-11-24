@@ -57,7 +57,8 @@ public final class KitchenOrder implements Aggregate {
     	if (state != State.NEW) {
     		throw new IllegalStateException("only NEW order can start prep");
 		}
-    	state = State.PREPPING;
+        state = State.PREPPING;
+        
     	$eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderPrepStartedEvent(ref));
     
     }
@@ -85,7 +86,8 @@ public final class KitchenOrder implements Aggregate {
 		if (state != State.BAKING) {
 			throw new IllegalStateException("only BAKING order can start assembly");
 		}
-		state = State.ASSEMBLING;
+        state = State.ASSEMBLING;
+        
 		$eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderAssemblyStartedEvent(ref));
     
     }
@@ -101,7 +103,8 @@ public final class KitchenOrder implements Aggregate {
 		if (state != State.ASSEMBLING) {
 			throw new IllegalStateException("only ASSEMBLING order can finish assembly");
 		}
-		state = State.ASSEMBLED;
+        state = State.ASSEMBLED;
+        
 		$eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderAssemblyFinishedEvent(ref));
     
     }

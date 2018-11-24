@@ -57,6 +57,7 @@ public final class Pizza implements Aggregate {
             throw new IllegalStateException();
         }
         state = State.PREPPING;
+
         $eventLog.publish(new Topic("pizzas"), new PizzaPrepStartedEvent(ref));
     
     }
@@ -73,6 +74,7 @@ public final class Pizza implements Aggregate {
             throw new IllegalStateException();
         }
         state = State.PREPPED;
+
         $eventLog.publish(new Topic("pizzas"), new PizzaPrepFinishedEvent(ref));
     
     }
@@ -82,10 +84,12 @@ public final class Pizza implements Aggregate {
     }
 
     void startBake() {
+
         if (state != State.PREPPED) {
             throw new IllegalStateException();
         }
         state = State.BAKING;
+
         $eventLog.publish(new Topic("pizzas"), new PizzaBakeStartedEvent(ref));
     }
 
@@ -101,6 +105,7 @@ public final class Pizza implements Aggregate {
             throw new IllegalStateException();
         }
         state = State.BAKED;
+        
         $eventLog.publish(new Topic("pizzas"), new PizzaBakeFinishedEvent(ref));
     
     }
