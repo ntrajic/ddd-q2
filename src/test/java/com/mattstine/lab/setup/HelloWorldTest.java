@@ -12,9 +12,9 @@ public class HelloWorldTest {
     @Test
     @Category(FirstSubmissionTest.class)
     public void helloLabSubmission() {
-        HelloWorld helloWorld = new HelloWorld("It works!");
+        HelloWorld helloWorld = new HelloWorld(" It works! ");
 
-        assertThat(helloWorld.getMessage()).isEqualTo("It works!");
+        assertThat(helloWorld.getMessage()).isEqualTo(" It works! ");
     }
 
     @Value
