@@ -25,13 +25,17 @@ final class DeliveryService {
 		this.orderingService = orderingService;
 		this.kitchenService = kitchenService;
 
+		// subscribe to kitchen_orders TOPIC
 		this.eventLog.subscribe(new Topic("kitchen_orders"), e -> {
+
 			KitchenOrderAssemblyFinishedEvent kitchenOrderAssemblyFinishedEvent = (KitchenOrderAssemblyFinishedEvent) e;
 			addDeliveryOrderToRepository(kitchenOrderAssemblyFinishedEvent);
+
 		});
 	}
 
 	private void addDeliveryOrderToRepository(KitchenOrderAssemblyFinishedEvent e) {
+
 		KitchenOrderRef kitchenOrderRef = e.getRef();
 		KitchenOrder kitchenOrder = kitchenService.findKitchenOrderByRef(kitchenOrderRef);
 		OnlineOrderRef onlineOrderRef = kitchenOrder.getOnlineOrderRef();
@@ -40,20 +44,25 @@ final class DeliveryService {
 		if (onlineOrder.getType().equals(OnlineOrder.Type.DELIVERY)) {
 			DeliveryOrder deliveryOrder = kitchenOrderToDeliveryOrder(kitchenOrder);
 			deliveryOrderRepository.add(deliveryOrder);
+
 		}
 	}
 
 	private DeliveryOrder kitchenOrderToDeliveryOrder(KitchenOrder kitchenOrder) {
+
 		DeliveryOrder.DeliveryOrderBuilder deliveryOrderBuilder = DeliveryOrder.builder()
 				.ref(deliveryOrderRepository.nextIdentity())
 				.kitchenOrderRef(kitchenOrder.getRef())
 				.onlineOrderRef(kitchenOrder.getOnlineOrderRef())
 				.eventLog(eventLog);
 
+
 		kitchenOrder.getPizzas().forEach(
+
 				pizza -> deliveryOrderBuilder.pizza(DeliveryOrder.Pizza.builder()
 						.size(kitchenOrderPizzaSizeToDeliveryOrderPizzaSize(pizza.getSize()))
 						.build()));
+						
 
 		return deliveryOrderBuilder.build();
 	}
@@ -72,6 +81,8 @@ final class DeliveryService {
 	}
 
 	DeliveryOrder findDeliveryOrderByKitchenOrderRef(KitchenOrderRef kitchenOrderRef) {
+
 		return deliveryOrderRepository.findByKitchenOrderRef(kitchenOrderRef);
+
 	}
 }

@@ -9,12 +9,15 @@ import lombok.Value;
  */
 @Value
 public final class DeliveryOrderRef implements Ref {
+
 	public static final DeliveryOrderRef IDENTITY = new DeliveryOrderRef("");
 	private String reference;
 
 	@SuppressWarnings("WeakerAccess")
 	public DeliveryOrderRef() {
+
 		reference = RefStringGenerator.generateRefString();
+		
 	}
 
 	@SuppressWarnings("SameParameterValue")

@@ -13,6 +13,7 @@ import java.util.Map;
  */
 final class InProcessEventSourcedDeliveryOrderRepository extends InProcessEventSourcedRepository<DeliveryOrderRef, DeliveryOrder, DeliveryOrder.OrderState, DeliveryOrderEvent, DeliveryOrderAddedEvent> implements DeliveryOrderRepository {
 
+	// dual index search 
 	private final Map<KitchenOrderRef, DeliveryOrderRef> kitchenOrderRefToDeliveryOrderRef;
 
 	InProcessEventSourcedDeliveryOrderRepository(EventLog eventLog, Topic topic) {
@@ -37,11 +38,13 @@ final class InProcessEventSourcedDeliveryOrderRepository extends InProcessEventS
 
 	@Override
 	public DeliveryOrder findByKitchenOrderRef(KitchenOrderRef kitchenOrderRef) {
+
 		DeliveryOrderRef deliveryOrderRef = kitchenOrderRefToDeliveryOrderRef.get(kitchenOrderRef);
 		DeliveryOrder deliveryOrder = findByRef(deliveryOrderRef);
 		if (deliveryOrder != null) {
 			return deliveryOrder;
 		}
 		return null;
+		
 	}
 }

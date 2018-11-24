@@ -41,7 +41,9 @@ public final class DeliveryOrder implements Aggregate {
 		this.pizzas = pizzas;
 		this.$eventLog = eventLog;
 
+
 		this.state = State.READY_FOR_DELIVERY;
+
 	}
 
 	/**
@@ -49,37 +51,48 @@ public final class DeliveryOrder implements Aggregate {
 	 */
 	@SuppressWarnings("unused")
 	private DeliveryOrder() {
+
+		// Support Reflexion
 		this.ref = null;
 		this.kitchenOrderRef = null;
 		this.onlineOrderRef = null;
 		this.pizzas = null;
 		this.$eventLog = null;
+
 	}
 
 	@Override
 	public DeliveryOrder identity() {
+
 		return DeliveryOrder.builder()
 				.eventLog(EventLog.IDENTITY)
 				.kitchenOrderRef(KitchenOrderRef.IDENTITY)
 				.onlineOrderRef(OnlineOrderRef.IDENTITY)
 				.ref(DeliveryOrderRef.IDENTITY)
 				.build();
+
 	}
 
 	@Override
 	public BiFunction<DeliveryOrder, DeliveryOrderEvent, DeliveryOrder> accumulatorFunction() {
+
 		return new Accumulator();
+
 	}
 
 
 
 	@Override
 	public OrderState state() {
+
 		return new OrderState(ref, kitchenOrderRef, onlineOrderRef, pizzas);
+
 	}
 
 	boolean isReadyForDelivery() {
+
 		return state == State.READY_FOR_DELIVERY;
+
 	}
 
 	enum State {
@@ -90,7 +103,9 @@ public final class DeliveryOrder implements Aggregate {
 
 		@Override
 		public DeliveryOrder apply(DeliveryOrder deliveryOrder, DeliveryOrderEvent deliveryOrderEvent) {
+
 			if (deliveryOrderEvent instanceof DeliveryOrderAddedEvent) {
+
 				DeliveryOrderAddedEvent doae = (DeliveryOrderAddedEvent) deliveryOrderEvent;
 				return DeliveryOrder.builder()
 						.ref(doae.getRef())
@@ -99,6 +114,7 @@ public final class DeliveryOrder implements Aggregate {
 						.eventLog(InProcessEventLog.instance())
 						.pizzas(doae.getState().getPizzas())
 						.build();
+						
 			}
 
 			throw new IllegalStateException("Unknown DeliveryOrderEvent");
