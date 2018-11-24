@@ -23,38 +23,58 @@ final class DefaultKitchenService implements KitchenService {
 		this.pizzaRepository = pizzaRepository;
 		this.orderingService = orderingService;
 
+		// 1
 		this.eventLog.subscribe(new Topic("ordering"), (e) -> {
+
 			if (e instanceof OnlineOrderPaidEvent) {
+
 				addKitchenOrderToRepository((OnlineOrderPaidEvent) e);
+
 			}
+
 		});
 
+		// 2. 
 		this.eventLog.subscribe(new Topic("kitchen_orders"), (e) -> {
+
 			if (e instanceof KitchenOrderPrepStartedEvent) {
 				createAndStartPrepOfKitchenOrderPizzas((KitchenOrderPrepStartedEvent) e);
 			}
+
 		});
 
-		this.eventLog.subscribe(new Topic("pizzas"), (e) -> {
+		// 3. 
+		this.eventLog.subscribe(new Topic("pizzas"), (e) -> { 
+
 			if (e instanceof PizzaPrepFinishedEvent) {
+
+				// 3.1.
 				PizzaPrepFinishedEvent ppfe = (PizzaPrepFinishedEvent) e;
 				Pizza pizza = pizzaRepository.findByRef(ppfe.getRef());
 				pizza.startBake();
+
 			} else if (e instanceof PizzaBakeStartedEvent) {
+
 				PizzaBakeStartedEvent pbse = (PizzaBakeStartedEvent) e;
 				Pizza pizza = pizzaRepository.findByRef(pbse.getRef());
 				KitchenOrder kitchenOrder = kitchenOrderRepository.findByRef(pizza.getKitchenOrderRef());
 
+				// 3.2.
 				if (kitchenOrder.isPrepping()) {
 					kitchenOrder.startBake();
 				}
+
 			} else if (e instanceof PizzaBakeFinishedEvent) {
+
 				PizzaBakeFinishedEvent pbfe = (PizzaBakeFinishedEvent) e;
 				Pizza pizza = pizzaRepository.findByRef(pbfe.getRef());
 				KitchenOrder kitchenOrder = kitchenOrderRepository.findByRef(pizza.getKitchenOrderRef());
 
+				// 3.3
 				if (kitchenOrder.isBaking()) {
+
 					kitchenOrder.startAssembly();
+
 				}
 
 				Set<Pizza> pizzas = pizzaRepository.findPizzasByKitchenOrderRef(pizza.getKitchenOrderRef());
@@ -63,45 +83,84 @@ final class DefaultKitchenService implements KitchenService {
 				}
 
 			}
+
 		});
 	}
 
+//----------------------------------------  
+//Implement the following command methods:
+//----------------------------------------
+//
+//startOrderPrep()
+//
+// finishPizzaPrep()
+//
+//removePizzaFromOven()
+//---------------------------------
+//Implement the following finders:
+//---------------------------------
+//findKitchenOrderByRef()
+//
+//findKitchenOrderByOnlineOrderRef()
+//
+//findPizzaByRef()
+//
+//findPizzasByKitchenOrderRef()
+//
+//---------------------------
+
+
+	
 	@Override
 	public void startOrderPrep(KitchenOrderRef kitchenOrderRef) {
+
 		KitchenOrder kitchenOrder = kitchenOrderRepository.findByRef(kitchenOrderRef);
 		kitchenOrder.startPrep();
+
 	}
 
 	@Override
 	public void finishPizzaPrep(PizzaRef ref) {
+
 		Pizza pizza = pizzaRepository.findByRef(ref);
 		pizza.finishPrep();
+
 	}
 
 	@Override
 	public void removePizzaFromOven(PizzaRef ref) {
+
 		Pizza pizza = pizzaRepository.findByRef(ref);
 		pizza.finishBake();
+
 	}
 
 	@Override
 	public KitchenOrder findKitchenOrderByRef(KitchenOrderRef kitchenOrderRef) {
+
 		return kitchenOrderRepository.findByRef(kitchenOrderRef);
+
 	}
 
 	@Override
 	public KitchenOrder findKitchenOrderByOnlineOrderRef(OnlineOrderRef onlineOrderRef) {
+
 		return kitchenOrderRepository.findByOnlineOrderRef(onlineOrderRef);
+
 	}
 
 	@Override
 	public Pizza findPizzaByRef(PizzaRef ref) {
+
 		return pizzaRepository.findByRef(ref);
+
 	}
 
 	@Override
 	public Set<Pizza> findPizzasByKitchenOrderRef(KitchenOrderRef kitchenOrderRef) {
+
 		return pizzaRepository.findPizzasByKitchenOrderRef(kitchenOrderRef);
+
 	}
 
 	private void createAndStartPrepOfKitchenOrderPizzas(KitchenOrderPrepStartedEvent e) {
@@ -121,13 +180,16 @@ final class DefaultKitchenService implements KitchenService {
 	}
 
 	private void addKitchenOrderToRepository(OnlineOrderPaidEvent e) {
+
 		OnlineOrderRef onlineOrderRef = e.getRef();
 		OnlineOrder onlineOrder = orderingService.findByRef(onlineOrderRef);
 		KitchenOrder kitchenOrder = onlineOrderToKitchenOrder(onlineOrder);
 		kitchenOrderRepository.add(kitchenOrder);
+
 	}
 
 	private KitchenOrder onlineOrderToKitchenOrder(OnlineOrder onlineOrder) {
+
 		KitchenOrder.KitchenOrderBuilder kitchenOrderBuilder = KitchenOrder.builder()
 				.ref(kitchenOrderRepository.nextIdentity())
 				.onlineOrderRef(onlineOrder.getRef())
@@ -139,6 +201,7 @@ final class DefaultKitchenService implements KitchenService {
 						.build()));
 
 		return kitchenOrderBuilder.build();
+
 	}
 
 	private Pizza.Size pizzaValueObjectSizeToPizzaAggregateSize(KitchenOrder.Pizza.Size voSize) {
