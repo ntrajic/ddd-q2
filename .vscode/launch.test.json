@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "pizza-shop-example",
+                "projectName": "pizza-shop-example",
+                "workingDirectory": "c:\\SRC\\ddd-q2",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "pizza-shop-example",
+                "projectName": "pizza-shop-example",
+                "workingDirectory": "c:\\SRC\\ddd-q2",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}
